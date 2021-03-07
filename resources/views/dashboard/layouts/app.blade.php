@@ -55,5 +55,7 @@
 
         {{-- delete confirm --}}
         @include('dashboard.partials.delete-confirm')
+
+        @yield('extra-js')
     </body>
 </html>

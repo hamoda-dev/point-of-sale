@@ -229,4 +229,12 @@ return [
 
     ],
 
+    /*
+     | app models to sync permissions
+     */
+    'models' => [
+        'users',
+        'categories',
+    ]
+
 ];

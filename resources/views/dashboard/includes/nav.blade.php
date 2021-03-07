@@ -133,9 +133,10 @@
             </div>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#">
-                <i class="fas fa-th-large"></i>
-            </a>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button class="btn nav-link" type="submit" title="@lang('site.logout')"><i class="fas fa-power-off"></i></button>
+            </form>
         </li>
     </ul>
 </nav>

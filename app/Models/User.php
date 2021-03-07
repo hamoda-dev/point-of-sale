@@ -23,6 +23,7 @@ class User extends Authenticatable
         'last_name',
         'email',
         'password',
+        'image',
     ];
 
     /**
@@ -43,6 +44,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    protected $appends = ['image_path'];
 
     /**
      * function to get frist_name
@@ -74,5 +77,10 @@ class User extends Authenticatable
     public function getFullName(): string
     {
         return (string) $this->getFirstName() . " " . $this->getLastName();
+    }
+
+    public function getImagePathAttribute()
+    {
+        return asset('uploads/users_image/'. $this->image);
     }
 }

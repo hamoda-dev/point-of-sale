@@ -7,8 +7,8 @@
                 title : "هل انت متأكد ؟",
                 text : "لا يمكنك استعادة البيانات التي تحذفها",
                 buttons: {
-                    confirm: "موافق",
-                    cancel: "الغاء",
+                    confirm: "@lang('site.yes')",
+                    cancel: "@lang('site.no')",
                 }
 
             })
