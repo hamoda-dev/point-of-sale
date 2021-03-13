@@ -31,6 +31,24 @@
                     </a>
                 </li>
 
+                @can('read_categories')
+                    <li class="nav-item">
+                        <a href="{{ route('dashboard.categories.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-tags"></i>
+                            <p>@lang('site.categories')</p>
+                        </a>
+                    </li>
+                @endcan
+
+                @can('read_products')
+                    <li class="nav-item">
+                        <a href="{{ route('dashboard.products.index') }}" class="nav-link">
+                            <i class="nav-icon fa fa-tags"></i>
+                            <p>@lang('site.products')</p>
+                        </a>
+                    </li>
+                @endcan
+
                 @can('read_users')
                     <li class="nav-item">
                         <a href="{{ route('dashboard.users.index') }}" class="nav-link">
@@ -39,15 +57,6 @@
                         </a>
                     </li>
                 @endcan
-
-{{--                @can('read_categories')--}}
-                    <li class="nav-item">
-                        <a href="{{ route('dashboard.categories.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-tags"></i>
-                            <p>@lang('site.categories')</p>
-                        </a>
-                    </li>
-{{--                @endcan--}}
 
             </ul>
         </nav>

@@ -177,11 +177,21 @@ return [
         'available'             => 'مُتاح',
         'size'                  => 'الحجم',
 
+
+
+        'purchase_price' => 'سعر الشراء',
+        'sale_price' => 'سعر البيع',
+        'stock' => 'الكمية في المخزن',
+        'image' => 'الصورة',
+        'category_id' => 'القسم',
+
         'ar' => [
             'name' => 'الاسم',
+            'description' => 'الوصف',
         ],
         'en' => [
-            'name' => 'الاسم'
+            'name' => 'الاسم',
+            'description' => 'الوصف',
         ]
     ],
 ];

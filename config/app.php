@@ -235,6 +235,7 @@ return [
     'models' => [
         'users',
         'categories',
+        'products',
     ]
 
 ];

@@ -37,7 +37,7 @@ class UserController extends Controller
             });
         })->latest()->paginate(10);
 
-        return view('dashboard.pages.users.index',compact('users'));
+        return view('dashboard.pages.users.index', compact('users'));
     }
 
     /**
@@ -148,8 +148,10 @@ class UserController extends Controller
      */
     public function destroy(User $user): RedirectResponse
     {
-        // delete user image
-        Storage::disk('public_uploads')->delete('users_image' . $user->image);
+        if ($user->image !== 'default.png') {
+            // delete user image
+            Storage::disk('public_uploads')->delete('users_image' . $user->image);
+        }
 
         // delete user
         $user->delete();
