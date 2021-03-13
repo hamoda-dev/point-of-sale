@@ -49,10 +49,19 @@
                     </li>
                 @endcan
 
+                @can('read_clients')
+                    <li class="nav-item">
+                        <a href="{{ route('dashboard.clients.index') }}" class="nav-link">
+                            <i class="nav-icon fa fa-users"></i>
+                            <p>@lang('site.clients')</p>
+                        </a>
+                    </li>
+                @endcan
+
                 @can('read_users')
                     <li class="nav-item">
                         <a href="{{ route('dashboard.users.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-users"></i>
+                            <i class="nav-icon fas fa-users-cog"></i>
                             <p>@lang('site.users')</p>
                         </a>
                     </li>

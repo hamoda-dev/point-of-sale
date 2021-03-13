@@ -188,10 +188,13 @@ return [
         'ar' => [
             'name' => 'الاسم',
             'description' => 'الوصف',
+            'address' => 'العنوان',
         ],
+
         'en' => [
             'name' => 'الاسم',
             'description' => 'الوصف',
+            'address' => 'العنوان',
         ]
     ],
 ];

@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductTranslation extends Model
+class ClientTranslation extends Model
 {
     use HasFactory;
 
     /**
-     * @var string[]
+     * @var bool
      */
-    protected $fillable = ['name','description'];
+    public $timestamps = false;
+
+    protected $fillable = ['name', 'address'];
 }

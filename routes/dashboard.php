@@ -9,13 +9,17 @@ Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => [ 'l
         // index dashboard route
         Route::get('/', 'DashboardController@index')->name('index');
 
-        //users route
-        Route::resource('users', 'UserController')->except('show');
-
         //categories route
         Route::resource('categories', 'CategoryController')->except('show');
 
         //products route
         Route::resource('products', 'ProductController');
+
+        //clients route
+        Route::resource('clients', 'ClientController');
+
+        //users route
+        Route::resource('users', 'UserController')->except('show');
+
     });
 });

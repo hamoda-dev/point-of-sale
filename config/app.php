@@ -233,9 +233,10 @@ return [
      | app models to sync permissions
      */
     'models' => [
-        'users',
         'categories',
         'products',
+        'clients',
+        'users',
     ]
 
 ];
