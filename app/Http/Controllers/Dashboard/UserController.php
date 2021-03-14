@@ -25,7 +25,7 @@ class UserController extends Controller
 
     /**
      * Display a listing of the resource.
-     * @param Request
+     * @param Request $request
      * @return View
      */
     public function index(Request $request): View
@@ -33,7 +33,8 @@ class UserController extends Controller
         $users = User::whereRoleIs('admin')->where(function ($q) use ($request) {
             return $q->when($request->search, function ($query) use ($request) {
                return $query->where('first_name', 'like', '%' . $request->search . '%')
-                    ->orWhere('last_name', 'like', '%' . $request->search . '%');
+                   ->orWhere('last_name', 'like', '%' . $request->search . '%')
+                   ->orWhere('email', 'like', '%' . $request->search . '%');
             });
         })->latest()->paginate(10);
 
@@ -58,10 +59,13 @@ class UserController extends Controller
      */
     public function store(UserRequest $request): RedirectResponse
     {
+        // collect needed request data
         $requestData = $request->except('password','password_confirmation', 'permissions', 'image');
 
+        // add hashed password to request data
         $requestData['password'] = bcrypt($request->password);
 
+        // upload user image
         if ($request->image) {
             // resize img and upload it
             Image::make($request->image)
@@ -69,22 +73,21 @@ class UserController extends Controller
                     $constraint->aspectRatio();
                 })->save(public_path('uploads/users_image/' . $request->image->hashName()));
 
-            // add hash image name
+            // add hash image name to request data
             $requestData['image'] = $request->image->hashName();
         }
 
-        // must refactor to try catch
         // save user data
         $user = User::create($requestData);
 
-        // atatch admin role to user
+        // attach admin role to user
         $user->attachRole('admin');
 
         // check if not empty permission then sync permission to user
-        (!empty($request->permissions)) ? $user->syncPermissions($request->permissions) : "";
+        $request->permissions ?? $user->syncPermissions($request->permissions);
 
+        // flash success message
         session()->flash('success_message', trans('site.dataAddedSuccessfully'));
-
         return redirect()->route('dashboard.users.index');
     }
 
@@ -96,10 +99,6 @@ class UserController extends Controller
      */
     public function edit(User $user): View
     {
-        if (empty($user)) {
-            session()->flash('error_message', trans('site.user_not_exist'));
-        }
-
         return view('dashboard.pages.users.edit', compact('user'));
     }
 
@@ -112,8 +111,10 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, User $user): RedirectResponse
     {
+        // collect needed request data
         $requestData = $request->only(['first_name', 'last_name', 'email']);
 
+        // update user image
         if ($request->image) {
             // resize img and upload it
             Image::make($request->image)
@@ -132,7 +133,7 @@ class UserController extends Controller
         $user->update($requestData);
 
         // check if not empty permission then sync permission to user
-        (!empty($request->permissions)) ? $user->syncPermissions($request->permissions) : "";
+        $request->permissions ?? $user->syncPermissions($request->permissions);
 
         session()->flash("success_message", trans('site.dataUpdatedSuccessfully'));
 
@@ -144,19 +145,27 @@ class UserController extends Controller
      *
      * @param User $user
      * @return RedirectResponse
-     * @throws Exception
      */
     public function destroy(User $user): RedirectResponse
     {
-        if ($user->image !== 'default.png') {
+        try {
+            // delete user
+            $user->delete();
+
             // delete user image
-            Storage::disk('public_uploads')->delete('users_image' . $user->image);
+            if ($user->image !== 'default.png') {
+                // delete user image
+                Storage::disk('public_uploads')->delete('users_image' . $user->image);
+            }
+
+            // flash success message
+            session()->flash('success_message', trans('site.dataDeletedSuccessfully'));
+
+        } catch (Exception) {
+
+            // flash error message
+            session()->flash('error_message', trans('site.dataDeletedFail'));
         }
-
-        // delete user
-        $user->delete();
-
-        session()->flash('success_message', trans('site.dataDeletedSuccessfully'));
 
         return redirect()->route('dashboard.users.index');
     }

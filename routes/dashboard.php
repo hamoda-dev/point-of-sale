@@ -22,4 +22,6 @@ Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => [ 'l
         Route::resource('users', 'UserController')->except('show');
 
     });
+
+
 });
