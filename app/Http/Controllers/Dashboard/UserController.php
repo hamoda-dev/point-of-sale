@@ -84,7 +84,7 @@ class UserController extends Controller
         $user->attachRole('admin');
 
         // check if not empty permission then sync permission to user
-        $request->permissions ?? $user->syncPermissions($request->permissions);
+        (array) $request->permissions ?? $user->syncPermissions($request->permissions);
 
         // flash success message
         session()->flash('success_message', trans('site.dataAddedSuccessfully'));
@@ -132,8 +132,8 @@ class UserController extends Controller
         // update user data
         $user->update($requestData);
 
-        // check if not empty permission then sync permission to user
-        $request->permissions ?? $user->syncPermissions($request->permissions);
+        // sync permission to user
+        $user->syncPermissions((array) $request->permissions);
 
         session()->flash("success_message", trans('site.dataUpdatedSuccessfully'));
 

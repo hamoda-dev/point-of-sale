@@ -23,7 +23,7 @@ class UserRequest extends FormRequest
      */
     public function rules()
     {
-        if (request()->isMethod("post")) {
+        if (request()->isMethod("post")) { // when create
             return [
                 'first_name' => 'required',
                 'last_name' => 'required',
@@ -31,7 +31,7 @@ class UserRequest extends FormRequest
                 'password' => 'required|confirmed',
                 'password_confirmation' => 'required',
             ];
-        } elseif (request()->isMethod('patch')) {
+        } elseif (request()->isMethod('patch')) {  // when update
             return [
                 'first_name' => 'required',
                 'last_name' => 'required',

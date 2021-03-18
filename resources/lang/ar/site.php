@@ -14,6 +14,9 @@ return [
     'no' => 'لا',
 
     'categories' => 'الاقسام',
+    'relatedProduct' => 'المنتجات المرتبطة',
+    'showProducts' => 'عرض المنتجات',
+    'productsCount' => 'عدد المنتجات',
     'name' => 'الاسم',
     'add_category' => 'اضافة قسم',
     'edit_category' => 'تعديل قسم',

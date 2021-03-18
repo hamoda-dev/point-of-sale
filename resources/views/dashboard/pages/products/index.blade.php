@@ -18,6 +18,12 @@
 
             <form action="{{ route('dashboard.products.index') }}" method="get" class="form-inline" style="display: inline-block">
                 <input type="text" name="search" value="{{ request()->search }}" class="form-control" placeholder="@lang('site.search')">
+                <select type="text" name="category" class="form-control" style="width: 250px">
+                    <option value="">اختر القسم</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}" {{ $category->id == request()->query('category') ? "selected": "" }}>{{ $category->name }}</option>
+                    @endforeach
+                </select>
                 <button class="btn btn-info mr-1" type="submit"><i class="fa fa-search"></i> @lang('site.search')</button>
             </form>
 
@@ -74,7 +80,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center">@lang('site.data_not_found')</td>
+                        <td colspan="8" class="text-center">@lang('site.data_not_found')</td>
                     </tr>
                 @endforelse
                 </tbody>

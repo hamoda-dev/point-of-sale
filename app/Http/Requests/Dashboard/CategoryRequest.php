@@ -26,10 +26,22 @@ class CategoryRequest extends FormRequest
     {
        $rules = [];
 
-       foreach (config(key: 'translatable.locales') as $locale) {
-           $rules += [$locale . '.name' => 'required'];
-//           $rules += [$locale . '.name' => [Rule::unique('category_translations')]];
+       if (request()->isMethod('post')) { // when create
+           foreach (config('translatable.locales') as $locale) {
+               $rules += [$locale . '.name' => 'required|unique:category_translations,name'];
+           }
+       } elseif (request()->isMethod('patch')) { // when update
+
+           // get category id
+           $path = explode('/', request()->requestUri);
+           $categoryId = end($path);
+
+           foreach (config('translatable.locales') as $locale) {
+               $rules += [$locale . '.name' => 'required'];
+               $rules += [$locale . '.name' => Rule::unique('category_translations', 'name')->ignore($categoryId, 'category_id')];
+           }
        }
+
 
        return $rules;
     }

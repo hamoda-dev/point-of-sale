@@ -11,9 +11,19 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use Exception;
 
 class ProductController extends Controller
 {
+    public function __construct()
+    {
+        // check permission to access methods
+        $this->middleware('permission:read_products')->only('index');
+        $this->middleware('permission:create_products')->only(['create', 'store']);
+        $this->middleware('permission:update_products')->only(['edit', 'update']);
+        $this->middleware('permission:delete_products')->only('destroy');
+    }
+
     /**
      * Display a listing of the resource.
      * @param Request $request
@@ -21,9 +31,24 @@ class ProductController extends Controller
      */
     public function index(Request $request): View
     {
-        $products = Product::paginate(12);
 
-        return view(view: 'dashboard.pages.products.index', data: compact(var_name: 'products'));
+        $products = Product::where(function ($query) use ($request) {
+
+            // filter when request have category id
+            $query->when($request->category, function ($q) use ($request) {
+                return $q->where('category_id', $request->category);
+            });
+
+            // filter when request have search
+            $query->when($request->search, function ($q) use ($request) {
+                return $q->whereTranslation('name', $request->search);
+            });
+
+        })->latest()->paginate(12);
+
+        $categories = Category::all();
+
+        return view('dashboard.pages.products.index', compact('products', 'categories'));
     }
 
     /**
@@ -34,7 +59,7 @@ class ProductController extends Controller
     public function create(): View
     {
         $categories = Category::all();
-        return view(view: 'dashboard.pages.products.create', data: compact(var_name: 'categories'));
+        return view('dashboard.pages.products.create', compact('categories'));
     }
 
     /**
@@ -58,9 +83,8 @@ class ProductController extends Controller
             $requestData['image'] = $request->image->hashName();
         }
 
-        // must refactor to try catch
-        // save user data
-        $user = Product::create($requestData);
+        // save product data
+        Product::create($requestData);
 
         session()->flash('success_message', trans('site.dataAddedSuccessfully'));
 
@@ -71,9 +95,9 @@ class ProductController extends Controller
      * Display the specified resource.
      *
      * @param  Product  $product
-     * @return \Illuminate\Http\Response
+     * @return View
      */
-    public function show(Product $product)
+    public function show(Product $product): View
     {
         //
     }
@@ -87,7 +111,7 @@ class ProductController extends Controller
     public function edit(Product $product): View
     {
         $categories = Category::all();
-        return view(view: 'dashboard.pages.products.edit', data: compact('categories','product'));
+        return view('dashboard.pages.products.edit', compact('categories','product'));
     }
 
     /**
@@ -112,8 +136,7 @@ class ProductController extends Controller
             $requestData['image'] = $request->image->hashName();
         }
 
-        // must refactor to try catch
-        // save user data
+        // update product data
         $product->update($requestData);
 
         session()->flash('success_message', trans('site.dataUpdatedSuccessfully'));
@@ -124,22 +147,26 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  Product  $product
+     * @param  Product $product
      * @return RedirectResponse
      */
     public function destroy(Product $product): RedirectResponse
     {
-        if ($product->image !== 'product.png') {
-            // delete user image
-            Storage::disk('public_uploads')->delete('products_image/' . $product->image);
+
+        try {
+            // delete product
+            $product->delete();
+
+            if ($product->image !== 'product.png') {
+                // delete product image
+                Storage::disk('public_uploads')->delete('products_image/' . $product->image);
+            }
+
+            session()->flash('success_message', trans('site.dataDeletedSuccessfully'));
+        } catch (Exception) {
+            session()->flash('error_message', trans('site.dataDeletedFail'));
         }
 
-        // delete user
-        $product->delete();
-
-        session()->flash('success_message', trans('site.dataDeletedSuccessfully'));
-
         return redirect()->route('dashboard.products.index');
-
     }
 }

@@ -6,20 +6,33 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\CategoryRequest;
 use App\Models\Category;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\View;
 
 class CategoryController extends Controller
 {
+    public function __construct()
+    {
+        // check permission to access methods
+        $this->middleware('permission:read_categories')->only('index');
+        $this->middleware('permission:create_categories')->only(['create', 'store']);
+        $this->middleware('permission:update_categories')->only(['edit', 'update']);
+        $this->middleware('permission:delete_categories')->only('destroy');
+    }
+
     /**
      * Display a listing of the resource.
-     *
+     * @param Request $request
      * @return View
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $categories = Category::all();
-        return view(view: 'dashboard.pages.categories.index', data: compact(var_name: 'categories'));
+        $categories = Category::when($request->search, function ($q) use ($request) {
+            return $q->whereTranslation('name', $request->search);
+        })->latest()->paginate(12);
+
+        return view('dashboard.pages.categories.index', compact('categories'));
     }
 
     /**
@@ -29,7 +42,7 @@ class CategoryController extends Controller
      */
     public function create(): View
     {
-        return view(view: 'dashboard.pages.categories.create');
+        return view('dashboard.pages.categories.create');
     }
 
     /**
@@ -42,9 +55,9 @@ class CategoryController extends Controller
     {
         Category::create($request->all());
 
-        session()->flash(key: 'success_message', value: trans(key: 'site.dataAddedSuccessfully'));
+        session()->flash('success_message', trans('site.dataAddedSuccessfully'));
 
-        return redirect()->route(route: 'dashboard.categories.index');
+        return redirect()->route('dashboard.categories.index');
     }
 
     /**
@@ -55,7 +68,7 @@ class CategoryController extends Controller
      */
     public function edit(Category $category): View
     {
-        return view(view: 'dashboard.pages.categories.edit', data: compact(var_name: 'category'));
+        return view('dashboard.pages.categories.edit', compact('category'));
     }
 
     /**
@@ -69,7 +82,7 @@ class CategoryController extends Controller
     {
         $category->update($request->all());
 
-        session()->flash(key: 'success_message', value: trans('site.dataUpdatedSuccessfully'));
+        session()->flash('success_message', trans('site.dataUpdatedSuccessfully'));
 
         return redirect()->route('dashboard.categories.index');
     }
@@ -79,13 +92,15 @@ class CategoryController extends Controller
      *
      * @param Category $category
      * @return RedirectResponse
-     * @throws Exception
      */
     public function destroy(Category $category): RedirectResponse
     {
-        $category->delete();
-
-        session()->flash('success_message', trans('site.dataDeletedSuccessfully'));
+        try {
+            $category->delete();
+            session()->flash('success_message', trans('site.dataDeletedSuccessfully'));
+        } catch (Exception) {
+            session()->flash('error_message', trans('site.dataDeletedFail'));
+        }
 
         return redirect()->route('dashboard.categories.index');
     }

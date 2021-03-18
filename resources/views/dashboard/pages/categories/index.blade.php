@@ -16,10 +16,10 @@
         <div class="card-header">
             <h4 class="mb-3">@lang('site.categories')</h4>
 
-{{--            <form action="{{ route('dashboard.categories.index') }}" method="get" class="form-inline" style="display: inline-block">--}}
-{{--                <input type="text" name="search" value="{{ request()->search }}" class="form-control" placeholder="@lang('site.search')">--}}
-{{--                <button class="btn btn-info mr-1" type="submit"><i class="fa fa-search"></i> @lang('site.search')</button>--}}
-{{--            </form>--}}
+            <form action="{{ route('dashboard.categories.index') }}" method="get" class="form-inline" style="display: inline-block">
+                <input type="text" name="search" value="{{ request()->search }}" class="form-control" placeholder="@lang('site.search')">
+                <button class="btn btn-info mr-1" type="submit"><i class="fa fa-search"></i> @lang('site.search')</button>
+            </form>
 
             @if(auth()->user()->hasPermission('create_categories'))
                 <a href="{{ route('dashboard.categories.create') }}" class="btn btn-success"><i class="fa fa-plus"></i> @lang('site.add_category')</a>
@@ -34,6 +34,8 @@
                     <tr>
                         <th>#</th>
                         <th>{{ trans('site.name') }}</th>
+                        <th>{{ trans('site.productsCount') }}</th>
+                        <th>{{ trans('site.relatedProduct') }}</th>
                         <th>{{ trans('site.action') }}</th>
                     </tr>
                 </thead>
@@ -42,6 +44,15 @@
                         <tr>
                             <td>{{ $index + 1 }}</td>
                             <td>{{ $category->name }}</td>
+                            <td>{{ $category->products->count() }} منتج </td>
+                            <td>
+                                @if(auth()->user()->hasPermission('read_products'))
+                                    <a href="{{ route('dashboard.products.index', ['category' => $category->id]) }}" class="btn btn-info btn-sm">@lang('site.showProducts')</a>
+                                @else
+                                    <a href="#" class="btn btn-info btn-sm disabled">@lang('site.showProducts')</a>
+                                @endif
+
+                            </td>
                             <td>
                                 @if(auth()->user()->hasPermission('update_categories'))
                                     <a href="{{ route('dashboard.categories.edit', $category->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i> @lang('site.edit')</a>
@@ -70,6 +81,6 @@
         </div>
     </div>
 
-{{--    {{ $categories->links() }}--}}
+    {{ $categories->links() }}
 
 @endsection
